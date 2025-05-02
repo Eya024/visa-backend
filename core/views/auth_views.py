@@ -47,11 +47,13 @@ def logout_user(request):
         return JsonResponse({'message': 'Logged out successfully'})
 
 
+@csrf_exempt
 def current_user(request):
     if request.user.is_authenticated:
         return JsonResponse({'username': request.user.username, 'role': request.user.role})
     else:
         return JsonResponse({'user': None})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.role == 'admin')
