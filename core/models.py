@@ -8,7 +8,8 @@ class User(AbstractUser):
         ('admin', 'Admin'),
         ('advisor', 'Advisor'),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, default='student')
+
     phone_number = models.CharField(max_length=20, blank=True)
 
 class Application(models.Model):

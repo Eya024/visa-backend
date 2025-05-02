@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-qef6eixv8fm-(fkv1)7ta4z*s0^+31a75-h(a0&2e+yi805(u-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -38,15 +38,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Should be first
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Session middleware should be here
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Authentication middleware should be here
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -77,6 +79,22 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # config/settings.py
 
 AUTH_USER_MODEL = 'core.User'
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+
+CORS_ALLOW_CREDENTIALS = True
+
+# In settings.py
+SESSION_COOKIE_SAMESITE = 'Lax'   # or 'Strict'
+SESSION_COOKIE_SECURE = False  # Set to True in production when using HTTPS
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default session engine
+SESSION_COOKIE_NAME = 'sessionid'  # Cookie name to store the session ID
+
+
 
 
 DATABASES = {
