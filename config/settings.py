@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
+# Increase the maximum size for request data (in bytes)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB, for example
+
+# Optionally, also increase FILE_UPLOAD_MAX_MEMORY_SIZE
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
 
 # Application definition
 

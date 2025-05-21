@@ -21,9 +21,25 @@ class Application(models.Model):
         ('rejected', 'Rejected'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone_number = models.CharField(max_length=20)
+    date_of_birth = models.DateField()
+    passport_number = models.CharField(max_length=20)
+    nationality = models.CharField(max_length=50)
+    destination_country = models.CharField(max_length=50)
+    visa_type = models.CharField(max_length=20)
+    purpose_of_travel = models.CharField(max_length=255)
+    duration_of_stay = models.CharField(max_length=100)
+    occupation = models.CharField(max_length=100)
+    education_level = models.CharField(max_length=50)
+    marital_status = models.CharField(max_length=20)
+    supporting_documents = models.TextField(blank=True)  # Comma-separated URLs
+    additional_notes_file = models.FileField(upload_to='notes/', blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
 class Document(models.Model):
     DOC_TYPES = [
@@ -53,7 +69,12 @@ class Note(models.Model):
 
 class Appointment(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='student_appointments')
-    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_appointments')
-    date = models.DateTimeField()
-    meeting_link = models.TextField()
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, related_name='admin_appointments', null=True, blank=True)
+    reason = models.TextField()
     status = models.CharField(max_length=20, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('cancelled', 'Cancelled')], default='scheduled')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class Availability(models.Model):
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='availabilities')
+    day = models.CharField(max_length=20)
+    time = models.CharField(max_length=20)

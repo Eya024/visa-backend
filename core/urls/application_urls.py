@@ -1,10 +1,11 @@
-# In core/urls/application_urls.py
+from core.views import application_views
 from django.urls import path
-from core.views.application_views import create_application, list_applications, update_application_status, student_dashboard
 
 urlpatterns = [
-    path('create/', create_application),
-    path('list/', list_applications),
-    path('update/<int:app_id>/', update_application_status),
-    path('dashboard/<int:user_id>/', student_dashboard),
+    path('create/', application_views.create_application),
+    path('list/', application_views.list_applications),
+    #path('update/<int:app_id>/', application_views.update_application_status),
+    path('dashboard/<int:user_id>/', application_views.student_dashboard),
+    path('update/<int:app_id>/', application_views.update_application),
+    path('user/<int:user_id>/', application_views.get_user_application),
 ]

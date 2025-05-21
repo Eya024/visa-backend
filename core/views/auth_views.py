@@ -50,7 +50,11 @@ def logout_user(request):
 @csrf_exempt
 def current_user(request):
     if request.user.is_authenticated:
-        return JsonResponse({'username': request.user.username, 'role': request.user.role})
+        return JsonResponse({
+            'id': request.user.id,
+            'username': request.user.username,
+            'role': request.user.role
+        })
     else:
         return JsonResponse({'user': None})
 
