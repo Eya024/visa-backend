@@ -58,20 +58,48 @@ def list_appointments(request):
 # In core/views/appointment_views.py
 @csrf_exempt
 def update_appointment_status(request, appointment_id):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            status = data.get('status')
-            if status not in dict(Appointment._meta.get_field('status').choices):
-                return HttpResponseBadRequest("Invalid status value.")
+    try:
+        appointment = Appointment.objects.get(id=appointment_id)
+    except Appointment.DoesNotExist:
+        return HttpResponseBadRequest("Appointment not found")
 
-            appointment = Appointment.objects.get(id=appointment_id)
-            appointment.status = status
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        status = data.get('status')
+        if status not in dict(Appointment._meta.get_field('status').choices):
+            return HttpResponseBadRequest("Invalid status value.")
+        appointment.status = status
+        appointment.save()
+        return JsonResponse({'id': appointment.id, 'status': appointment.status})
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        reason = data.get('reason')
+        availabilities = data.get('availabilities')
+
+        if reason:
+            appointment.reason = reason
             appointment.save()
 
-            return JsonResponse({'id': appointment.id, 'status': appointment.status})
-        except Exception as e:
-            return HttpResponseBadRequest(str(e))
+        if availabilities is not None:
+            # Clear old availabilities
+            appointment.availabilities.all().delete()
+            # Add new ones
+            for slot in availabilities:
+                Availability.objects.create(
+                    appointment=appointment,
+                    day=slot['day'],
+                    time=slot['time']
+                )
+
+        return JsonResponse({'id': appointment.id, 'reason': appointment.reason, 'availabilities': availabilities})
+
+    elif request.method == 'DELETE':
+        appointment.delete()
+        return JsonResponse({'message': 'Appointment deleted'})
+
+    else:
+        return HttpResponseBadRequest("Unsupported HTTP method")
 
 
 # In core/views/appointment_views.py
