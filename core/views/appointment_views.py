@@ -4,6 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from core.models import Appointment, User, Availability
 from django.utils import timezone
 
+from core.models import Appointment, User, Availability, Notification  # Import Notification
+
 @csrf_exempt
 def create_appointment(request):
     if request.method == 'POST':
@@ -24,6 +26,13 @@ def create_appointment(request):
                     day=slot['day'],
                     time=slot['time']
                 )
+
+            # Create notification
+            Notification.objects.create(
+                user=student,
+                title="Appointment Requested",
+                message="Your appointment was requested!",
+            )
 
             return JsonResponse({'id': appointment.id, 'status': appointment.status})
         except Exception as e:
@@ -72,31 +81,73 @@ def update_appointment_status(request, appointment_id):
         appointment.save()
         return JsonResponse({'id': appointment.id, 'status': appointment.status})
 
+
     elif request.method == 'PUT':
+
         data = json.loads(request.body)
+
         reason = data.get('reason')
+
         availabilities = data.get('availabilities')
 
         if reason:
             appointment.reason = reason
+
             appointment.save()
 
         if availabilities is not None:
-            # Clear old availabilities
+
             appointment.availabilities.all().delete()
-            # Add new ones
+
             for slot in availabilities:
                 Availability.objects.create(
+
                     appointment=appointment,
+
                     day=slot['day'],
+
                     time=slot['time']
+
                 )
+
+        # Send notification for update
+
+        Notification.objects.create(
+
+            user=appointment.student,
+
+            title="Appointment Updated",
+
+            message="Your appointment details have been updated.",
+
+        )
 
         return JsonResponse({'id': appointment.id, 'reason': appointment.reason, 'availabilities': availabilities})
 
+
+
     elif request.method == 'DELETE':
+
+        # Store student before deletion
+
+        student = appointment.student
+
         appointment.delete()
+
+        # Send notification for deletion
+
+        Notification.objects.create(
+
+            user=student,
+
+            title="Appointment Deleted",
+
+            message="Your appointment request was deleted.",
+
+        )
+
         return JsonResponse({'message': 'Appointment deleted'})
+
 
     else:
         return HttpResponseBadRequest("Unsupported HTTP method")

@@ -1,5 +1,6 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import models
+from django.utils import timezone
 
 # User model with roles
 class User(AbstractUser):
@@ -78,3 +79,13 @@ class Availability(models.Model):
     appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='availabilities')
     day = models.CharField(max_length=20)
     time = models.CharField(max_length=20)
+
+
+
+class PageVisit(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    page_name = models.CharField(max_length=100)
+    visited_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.username} visited {self.page_name} at {self.visited_at}"

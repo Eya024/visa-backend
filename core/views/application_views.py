@@ -135,6 +135,31 @@ def student_dashboard(request, user_id):
         except Exception as e:
             return HttpResponseBadRequest(str(e))
 
+def calculate_application_progress(app):
+    total_fields = 15  # number of important fields you're checking
+    filled = 0
+    fields_to_check = [
+        app.full_name,
+        app.email,
+        app.phone_number,
+        app.date_of_birth,
+        app.passport_number,
+        app.nationality,
+        app.destination_country,
+        app.visa_type,
+        app.purpose_of_travel,
+        app.duration_of_stay,
+        app.occupation,
+        app.education_level,
+        app.marital_status,
+        app.supporting_documents,
+        app.additional_notes_file,
+    ]
+    for field in fields_to_check:
+        if field:  # not None or empty
+            filled += 1
+    return round((filled / total_fields) * 100, 1)
+
 
 @csrf_exempt
 def get_user_application(request, user_id):
@@ -164,6 +189,8 @@ def get_user_application(request, user_id):
                     'education_level': app.education_level,
                     'marital_status': app.marital_status,
                     'supporting_documents': app.supporting_documents,
+                    'progress': calculate_application_progress(app)
+
                 }
             })
         except Exception as e:
