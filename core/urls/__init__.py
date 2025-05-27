@@ -7,4 +7,6 @@ urlpatterns = [
     path('notifications/', include('core.urls.notification_urls')),
     path('appointments/', include('core.urls.appointment_urls')),
     path('notes/', include('core.urls.note_urls')),
+    path('contact/', include('core.urls.contact_urls')),
+
 ]

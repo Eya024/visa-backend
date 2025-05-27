@@ -47,6 +47,17 @@ def create_application(request):
                 created_at=timezone.now()
             )
 
+            # Notify admin(s)
+            admin_users = User.objects.filter(role='admin')  # or use is_staff=True or a custom role field
+            for admin in admin_users:
+                Notification.objects.create(
+                    user=admin,
+                    title="New Application Submitted",
+                    message=f"Student {user.username} (ID: {user.id}) has submitted a new application.",
+                    seen=False,
+                    created_at=timezone.now()
+                )
+
             return JsonResponse({'id': app.id, 'status': app.status})
         except Exception as e:
             return HttpResponseBadRequest(str(e))
@@ -231,6 +242,16 @@ def update_application(request, app_id):
                 seen=False,
                 created_at=timezone.now()
             )
+            # Notify admin(s)
+            admin_users = User.objects.filter(role='admin')  # or use is_staff=True
+            for admin in admin_users:
+                Notification.objects.create(
+                    user=admin,
+                    title="Application Updated",
+                    message=f"Student {app.user.username} (ID: {app.user.id}) has updated their application.",
+                    seen=False,
+                    created_at=timezone.now()
+                )
 
             return JsonResponse({'message': 'Application updated successfully'})
         except Exception as e:

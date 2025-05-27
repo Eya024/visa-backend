@@ -34,6 +34,15 @@ def create_appointment(request):
                 message="Your appointment was requested!",
             )
 
+            # Notify admins
+            admins = User.objects.filter(is_staff=True)  # Assuming admins have is_staff=True
+            for admin in admins:
+                Notification.objects.create(
+                    user=admin,
+                    title="New Appointment Created",
+                    message=f"Student '{student.username}' (ID: {student.id}) has requested a new appointment.",
+                )
+
             return JsonResponse({'id': appointment.id, 'status': appointment.status})
         except Exception as e:
             return HttpResponseBadRequest(str(e))
@@ -121,6 +130,14 @@ def update_appointment_status(request, appointment_id):
             message="Your appointment details have been updated.",
 
         )
+        # Notify admins of update
+        admins = User.objects.filter(is_staff=True)
+        for admin in admins:
+            Notification.objects.create(
+                user=admin,
+                title="Appointment Updated",
+                message=f"Student '{appointment.student.username}' (ID: {appointment.student.id}) updated their appointment.",
+            )
 
         return JsonResponse({'id': appointment.id, 'reason': appointment.reason, 'availabilities': availabilities})
 
@@ -145,6 +162,14 @@ def update_appointment_status(request, appointment_id):
             message="Your appointment request was deleted.",
 
         )
+        # Notify admins of deletion
+        admins = User.objects.filter(is_staff=True)
+        for admin in admins:
+            Notification.objects.create(
+                user=admin,
+                title="Appointment Deleted",
+                message=f"Student '{student.username}' (ID: {student.id}) deleted their appointment.",
+            )
 
         return JsonResponse({'message': 'Appointment deleted'})
 
